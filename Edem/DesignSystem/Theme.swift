@@ -6,13 +6,11 @@ enum Palette {
     static let ink = Color(hex: 0x111827)
     static let textSecondary = Color(hex: 0x6B7280)
     static let textTertiary = Color(hex: 0x4B5563)
-    static let slate = Color(hex: 0x334155)
     static let surface = Color(hex: 0xF3F4F6)
     static let surfaceMuted = Color(hex: 0xF9FAFB)
     static let border = Color(hex: 0xE5E7EB)
     static let placeholder = Color(hex: 0xCBD5E1)
     static let dashed = Color(hex: 0x94A3B8)
-    static let mapBackground = Color(hex: 0xE9EEF1)
 
     static let accent = Color(hex: 0x2F6BFF)
     static let success = Color(hex: 0x16A34A)
@@ -48,8 +46,6 @@ extension UIColor {
     static let edemInk = UIColor(hex: 0x111827)
     static let edemSecondary = UIColor(hex: 0x6B7280)
     static let edemSurface = UIColor(hex: 0xF3F4F6)
-    static let edemBorder = UIColor(hex: 0xE5E7EB)
-    static let edemAccent = UIColor(hex: 0x2F6BFF)
     static let edemSuccess = UIColor(hex: 0x16A34A)
     static let edemWarning = UIColor(hex: 0xB45309)
     static let edemPlaceholder = UIColor(hex: 0xCBD5E1)
@@ -68,12 +64,6 @@ enum Formatters {
     static func duration(_ interval: TimeInterval) -> String {
         let total = max(0, Int(interval))
         return String(format: "%02d:%02d:%02d", total / 3600, (total % 3600) / 60, total % 60)
-    }
-
-    /// 0:47
-    static func shortDuration(_ interval: TimeInterval) -> String {
-        let total = max(0, Int(interval))
-        return String(format: "%d:%02d", total / 60, total % 60)
     }
 
     static let time: DateFormatter = {

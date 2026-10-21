@@ -5,8 +5,6 @@ struct ParkingZone: Hashable, Sendable {
     let center: Coordinate
     /// Радиус в метрах.
     let radius: Double
-    /// Подсказка о плохой связи (подземный паркинг) — вывод №3 из ветки ошибки.
-    var hasWeakSignal: Bool = false
 
     func contains(_ point: Coordinate) -> Bool {
         Self.distance(from: center, to: point) <= radius

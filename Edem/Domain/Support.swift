@@ -27,11 +27,4 @@ enum SupportTopic: Hashable, Sendable {
     /// Спор о списании после поездки — «оспаривание в 1 клик» из CJM.
     case disputeCharge(tripID: UUID)
     case general
-
-    var tripID: UUID? {
-        switch self {
-        case .carNotLocking(let id), .disputeCharge(let id): return id
-        case .general: return nil
-        }
-    }
 }

@@ -6,8 +6,8 @@ import SwiftData
 @MainActor
 final class AppContainer {
     let modelContainer: ModelContainer
-    let rental: RentalManager
-    let settings: UserDefaultsSettingsStore
+    private let rental: RentalManager
+    private let settings: UserDefaultsSettingsStore
     let imageLoader: ImageLoading
 
     private let carRepository: CarRepository
@@ -17,8 +17,8 @@ final class AppContainer {
     private let notifications: NotificationService
     private let tariff = TariffCalculator()
 
-    init(inMemory: Bool = false) {
-        let configuration = ModelConfiguration(isStoredInMemoryOnly: inMemory)
+    init() {
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: false)
         do {
             modelContainer = try ModelContainer(
                 for: CarEntity.self, TripEntity.self, InspectionPhotoEntity.self,
@@ -34,7 +34,7 @@ final class AppContainer {
         self.settings = settings
 
         carRepository = DefaultCarRepository(
-            remote: DummyJSONCarsDataSource(api: api),
+            remote: FleetCarsDataSource(api: api),
             cache: SwiftDataCarsCache(context: context)
         )
         let tripRepository = SwiftDataTripRepository(context: context)

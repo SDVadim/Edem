@@ -36,7 +36,7 @@ struct ProfileView: View {
             }
 
             Section("О приложении") {
-                LabeledContent("Данные о машинах", value: "dummyjson.com")
+                LabeledContent("Данные о машинах", value: "свой API (GitHub Gist)")
                 LabeledContent("Хранилище", value: "SwiftData")
             }
         }

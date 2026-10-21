@@ -1,22 +1,11 @@
 import Foundation
 
+/// DummyJSON используется для двух POST-запросов: завершение аренды и сообщения в поддержку.
 enum DummyJSONEndpoint {
     static let baseURL = URL(string: "https://dummyjson.com")!
 
-    static let vehicles = baseURL.appendingPathComponent("products/category/vehicle")
     static let addPost = baseURL.appendingPathComponent("posts/add")
     static let addComment = baseURL.appendingPathComponent("comments/add")
-}
-
-/// Машины берутся из категории `vehicle` каталога DummyJSON.
-struct DummyJSONCarsDataSource: CarsRemoteDataSource {
-    let api: JSONAPIClient
-    var mapper = CarMapper()
-
-    func fetchCars() async throws -> [Car] {
-        let list: ProductListDTO = try await api.get(DummyJSONEndpoint.vehicles)
-        return mapper.map(list.products)
-    }
 }
 
 /// Отчёт о завершении аренды уходит на сервер как POST, в ответ приходит id — номер чека.

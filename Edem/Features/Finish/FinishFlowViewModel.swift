@@ -224,9 +224,4 @@ final class FinishFlowViewModel: Identifiable {
         closingTask?.cancel()
         rental.clearCurrentTrip()
     }
-
-    /// Можно ли закрыть поток крестиком без последствий (иконка 1 кадра 2).
-    var canCancel: Bool {
-        trip.status == .active
-    }
 }

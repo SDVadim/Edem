@@ -8,7 +8,6 @@ struct EdemApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(container: container)
-                // Макет нарисован только в светлой теме.
                 .preferredColorScheme(.light)
         }
         .modelContainer(container.modelContainer)

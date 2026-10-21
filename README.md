@@ -59,7 +59,7 @@ xcodegen
 | ≥ 4 экранов | Карта, Каталог, Карточка машины, Осмотр, Поездка, Завершение (6 шагов), Чат поддержки, История, Детали поездки, Профиль |
 | UIKit + UICollectionView | `Features/Catalog/CarsCollectionViewController.swift`: compositional layout, diffable data source, pull-to-refresh. Встроен в SwiftUI через `UIViewControllerRepresentable` |
 | Навигация SwiftUI | `TabView` из 4 вкладок, в каждой `NavigationStack(path:)` и свой `Router` (`App/RootView.swift`, `App/Router.swift`) |
-| Сеть | [DummyJSON](https://dummyjson.com): `GET /products/category/vehicle` — машины, `POST /posts/add` — завершение аренды (возвращает номер чека), `POST /comments/add` — сообщения в поддержку |
+| Сеть | Свой API на GitHub Gist: `GET …/raw/cars.json` — машины со всеми данными (см. «Свой API машин» ниже). [DummyJSON](https://dummyjson.com): `POST /posts/add` — завершение аренды (возвращает номер чека), `POST /comments/add` — сообщения в поддержку |
 | База данных | SwiftData: кэш машин (offline-first), поездки, фото осмотра (`Data/Persistence`) |
 | SOLID | См. ниже |
 | Данные отделены от UI | Экраны → ViewModel → протоколы из `Domain/Protocols.swift`. Конкретные классы создаются только в `App/AppContainer.swift` |
@@ -71,7 +71,7 @@ Edem/
 ├── App/            Composition root (AppContainer), TabView, роутинг
 ├── Domain/         Модели (Car, Trip, Receipt), тариф, зона парковки, протоколы
 ├── Data/
-│   ├── Network/    HTTPClient, DTO DummyJSON, маппер, сервисы API
+│   ├── Network/    HTTPClient, свой API машин, DTO и сервисы DummyJSON
 │   ├── Persistence/ SwiftData-сущности и хранилища
 │   ├── Repositories/ CarRepository: сеть + кэш
 │   └── Services/   RentalManager, настройки, уведомления, загрузка картинок,
@@ -80,18 +80,28 @@ Edem/
 └── Features/       Экран + ViewModel на каждую фичу
 ```
 
-- **S (единственная ответственность):** `TariffCalculator` только считает деньги, `CarMapper` только преобразует DTO в машины, репозитории только хранят данные.
+- **S (единственная ответственность):** `TariffCalculator` только считает деньги, `FleetCarsDataSource` только превращает ответ сервера в машины, репозитории только хранят данные.
 - **O (открытость/закрытость):** `ConnectionAwareVehicleService` — декоратор над сервисом команд. Режим «нет связи» и перевод сетевых ошибок добавлены без изменения исходного сервиса.
 - **L (подстановка Лисков):** любой `CarsRemoteDataSource`, `TripRepository` или `VehicleCommandService` взаимозаменяем. В тестах вместо них подставлены моки.
 - **I (разделение интерфейсов):** маленькие протоколы (`CarsCache`, `SupportService`, `NotificationService`, `SettingsStore`) вместо одного «сервиса всего».
 - **D (инверсия зависимостей):** ViewModel получают протоколы через инициализатор. Реализации собирает `AppContainer`.
 
+## Свой API машин
+
+Машины приходят с собственного API — файла `cars.json` на GitHub Gist (его копия лежит в корне проекта):
+
+`GET https://gist.githubusercontent.com/SDVadim/c726a115d36ee59bde44e8c35e37f402/raw/cars.json`
+
+По каждой машине сервер отдаёт все данные: `id`, `modelId`, `title`, `brand`, `description`, `pricePerMinute`, `carClass` (`economy` / `comfort` / `business`), `plate`, `fuelLevel`, `cleanliness`, `latitude`, `longitude`, `thumbnail`, `images`. Приложение ничего не генерирует: `FleetCarsDataSource` (`Data/Network/FleetCarsDataSource.swift`) только перекладывает поля ответа в модель `Car`. Неизвестный класс машины считается ошибкой ответа, а не подменяется значением по умолчанию.
+
+Чтобы поменять данные (координаты, топливо и т.д.), достаточно отредактировать gist — пересобирать приложение не нужно. GitHub и iOS кэшируют ответ на несколько минут; после этого потяните каталог вниз.
+
 ## Тесты
 
-`EdemTests` содержит 15 тестов:
+`EdemTests` содержит 13 тестов:
 - тариф: числа совпадают с кадрами 1, 7 и 6д;
-- маппинг DTO и разбор JSON со стабом HTTP;
-- декоратор «нет связи»;
+- разбор ответа своего API со стабом HTTP: все поля машины, пустая марка, ошибка при неизвестном классе, ошибка статуса 500;
+- декоратор «нет связи» и зона парковки;
 - фильтры каталога и офлайн-кэш;
 - сценарий завершения: основной путь и ветка «ошибка → повтор → оператор».
 
@@ -100,5 +110,5 @@ Edem/
 - Шрифт Inter из Figma заменён системным SF Pro: он поддерживает Dynamic Type.
 - Иконки взяты из SF Symbols.
 - Приложение всегда в светлой теме: тёмной в макете нет.
-- У DummyJSON всего 5 моделей машин. Каждая модель размножена в 3 машины автопарка с детерминированными номерами, топливом и координатами в Москве.
+- Машины (15 штук пяти моделей) отдаёт свой API на GitHub Gist: координаты, топливо, номера и остальные данные хранятся на сервере, а не генерируются в приложении. Фото машин — с CDN DummyJSON.
 - Ответ оператора в чате генерируется локально через 3 с: у DummyJSON нет живых операторов.
